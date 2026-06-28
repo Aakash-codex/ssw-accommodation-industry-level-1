@@ -6,8 +6,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>宿泊業技能測定試験 1号 対策アプリ</title>
   <style>
+    /* ===== CSS THEME VARIABLES ===== */
     :root {
       --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans JP", "Noto Sans Devanagari", sans-serif;
+      /* Light theme (default) */
+      --color-text-primary: #111111;
+      --color-text-secondary: #555555;
+      --color-text-tertiary: #8e8e93;
+      --color-text-info: #185fa5;
+      --color-text-success: #27500A;
+      --color-text-danger: #A32D2D;
+      --color-background-primary: rgba(255,255,255,0.88);
+      --color-background-secondary: rgba(245,245,247,0.80);
+      --color-border-tertiary: rgba(0,0,0,0.10);
+      --color-border-secondary: rgba(0,0,0,0.14);
+      --color-border-info: #a5cbf5;
+      --color-background-info: #e6f1fb;
+      --border-radius-lg: 14px;
+      --border-radius-md: 8px;
+    }
+
+    [data-theme="dark"] {
+      --color-text-primary: #f0f0f5;
+      --color-text-secondary: #aaaabc;
+      --color-text-tertiary: #6e6e82;
+      --color-text-info: #7ab8f5;
+      --color-text-success: #7ecb57;
+      --color-text-danger: #f28b82;
+      --color-background-primary: rgba(28,28,36,0.90);
+      --color-background-secondary: rgba(40,40,54,0.88);
+      --color-border-tertiary: rgba(255,255,255,0.10);
+      --color-border-secondary: rgba(255,255,255,0.16);
+      --color-border-info: #3b6ea8;
+      --color-background-info: rgba(24,95,165,0.25);
     }
 
     ruby {
@@ -17,7 +48,7 @@
 
     rt {
       font-size: 0.55em;
-      color: var(--color-text-tertiary, #8e8e93);
+      color: var(--color-text-tertiary);
       user-select: none;
       letter-spacing: normal;
       padding-bottom: 0.1em;
@@ -31,7 +62,27 @@
 
     body {
       font-family: var(--font-sans);
-      color: var(--color-text-primary)
+      color: var(--color-text-primary);
+      background-image: url('background.jpg');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      min-height: 100vh;
+      transition: background-color 0.3s ease;
+    }
+
+    /* Body overlay for readability */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(2px);
+      z-index: -1;
+      transition: background 0.3s ease;
+    }
+    [data-theme="dark"] body::before {
+      background: rgba(10,10,22,0.75);
     }
 
     .app {
@@ -526,12 +577,57 @@
       color: var(--color-text-tertiary, #8e8e93);
       margin: 0;
     }
+
+    /* ===== THEME TOGGLE BUTTON ===== */
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      border: 1.5px solid var(--color-border-secondary);
+      background: var(--color-background-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+      transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.20);
+    }
+
+    /* ===== CHAPTER BANNER IMAGE ===== */
+    .chapter-banner {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      object-position: center 30%;
+      border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+      margin-bottom: 0;
+      display: block;
+    }
+    .chapter-card-with-banner {
+      overflow: hidden;
+      padding: 0;
+    }
+    .chapter-card-with-banner .chapter-card-body {
+      padding: 1.25rem;
+    }
   </style>
+
+  <!-- Theme Toggle Button -->
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark/light theme" title="Toggle theme">🌙</button>
 
   <div class="app">
     <div class="header">
       <h1>宿泊業技能測定試験 1号 対策アプリ</h1>
-      <p>Accommodation Industry Proficiency Test Level 1 — Study Guide & Mock Exam</p>
+      <p>Accommodation Industry Proficiency Test Level 1 — Study Guide &amp; Mock Exam</p>
       <p style="font-size:12px;color:var(--color-text-tertiary);margin-top:4px">होटल उद्योग दक्षता परीक्षण तयारी</p>
     </div>
 
@@ -733,6 +829,39 @@
 
       return processed.join('');
     }
+
+    // ===== THEME TOGGLE =====
+    const CHAPTER_IMAGES = {
+      ch1: 'chapter-1.jpg',
+      ch2: 'chapter-2.jpg',
+      ch3: 'chapter-3.jpg',
+      ch4: 'chapter-4.jpg',
+      ch5: 'chapter-5.jpg',
+    };
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const btn = document.getElementById('themeToggle');
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        html.removeAttribute('data-theme');
+        btn.textContent = '🌙';
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.setAttribute('data-theme', 'dark');
+        btn.textContent = '☀️';
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+
+    // Restore saved theme on load
+    (function() {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('themeToggle').textContent = '☀️';
+      }
+    })();
 
     const DATA = {
       ch1: {
